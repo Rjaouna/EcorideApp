@@ -1,3 +1,2 @@
-body {
-    background-color: skyblue;
-}
+@import "variables";
+@import "~bootstrap/scss/bootstrap"; 
