@@ -1,0 +1,108 @@
+<div class="container bg-primary p-4 mt-3 shadow rounded">
+  <form method="get" action="#">
+    <div class="row text-center text-white">
+      <h2 class="fw-bold text-uppercase">
+        Passagers, recherchez un covoiturage ?
+      </h2>
+    </div>
+
+    <div class="row justify-content-center align-items-center g-0">
+
+      {# Départ #}
+      <div class="col-md-3 mx-2 d-flex align-items-center">
+        <div class="w-100 mb-0">
+          <input
+            type="text"
+            id="departureCity"
+            name="departureCity"
+            class="form-control form-control-lg"
+            placeholder="Départ : Paris, Lille..."
+            style="
+              background-image: url('{{ asset('assets/img/deparature.png') }}');
+              background-repeat: no-repeat;
+              background-position: 10px center;
+              background-size: 20px 20px;
+              padding-left: 40px;
+              color: rgb(113 113 113);
+              font-weight: bold;
+            "
+          >
+        </div>
+      </div>
+
+      {# Swap : flèche en SVG #}
+      <div class="col-md-auto d-flex justify-content-center align-items-center">
+        <div class="btn-group" role="group" aria-label="Permutation des villes">
+          <button type="button" id="swap" class="btn btn-light p-2" aria-label="Permuter vers la gauche">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+              <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {# Arrivée #}
+      <div class="col-md-3 mx-2 d-flex align-items-center">
+        <div class="w-100 mb-0">
+          <input
+            type="text"
+            id="destinationCity"
+            name="destinationCity"
+            class="form-control form-control-lg"
+            placeholder="Arrivée : Marseille, Paris"
+            style="
+              background-image: url('{{ asset('assets/img/arrivee.webp') }}');
+              background-repeat: no-repeat;
+              background-position: 10px center;
+              background-size: 20px 20px;
+              padding-left: 40px;
+              color: rgb(113 113 113);
+              font-weight: bold;
+            "
+          >
+        </div>
+      </div>
+
+      {# Date #}
+      <div class="col-md-2 mx-2 d-flex align-items-center">
+        <div class="w-100 mb-0">
+          <input
+            type="date"
+            id="travelDate"
+            name="travelDate"
+            class="form-control form-control-lg"
+            style="color: rgb(113 113 113); font-weight: bold;"
+          >
+        </div>
+      </div>
+
+      {# Bouton rechercher #}
+      <div class="col-md-2 mx-2 d-flex align-items-center">
+        <button type="submit" class="btn btn-secondary w-100 btn-lg">
+          Rechercher
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{# JS : permutation des deux champs #}
+<script>
+(() => {
+  const dep  = document.getElementById('departureCity');
+  const dest = document.getElementById('destinationCity');
+  const swapBtn = document.getElementById('swap'); 
+
+  if (!dep || !dest || !swapBtn) return;
+
+  function swapCities() {
+    const tmp = dep.value;
+    dep.value = dest.value;
+    dest.value = tmp;
+    dep.focus();
+  }
+
+  swapBtn.addEventListener('click', swapCities);
+})();
+</script>
+
