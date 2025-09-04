@@ -6,11 +6,7 @@
 <div class="container mt-5">
     <h1 class="mb-4">Contactez-nous</h1>
 
-    {% for label, messages in app.flashes %}
-        <div class="alert alert-success">
-            {{ messages|join(', ') }}
-        </div>
-    {% endfor %}
+    
 
     <div class="card shadow p-4">
         {{ form_start(form) }}
