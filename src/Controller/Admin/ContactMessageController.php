@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Entity\ContactMessage;
 use App\Form\ContactMessageType;
@@ -17,30 +17,11 @@ final class ContactMessageController extends AbstractController
     #[Route(name: 'app_contact_message_index', methods: ['GET'])]
     public function index(ContactMessageRepository $contactMessageRepository): Response
     {
-        return $this->render('contact_message/index.html.twig', [
+        return $this->render('admin/contact_message/index.html.twig', [
             'contact_messages' => $contactMessageRepository->findNotArchived(),
         ]);
     }
 
-    #[Route('/new', name: 'app_contact_message_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $contactMessage = new ContactMessage();
-        $form = $this->createForm(ContactMessageType::class, $contactMessage);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($contactMessage);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_contact_message_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('contact_message/new.html.twig', [
-            'contact_message' => $contactMessage,
-            'form' => $form,
-        ]);
-    }
 
     #[Route('/{id}', name: 'app_contact_message_show', methods: ['GET'])]
     public function show(ContactMessage $contactMessage, EntityManagerInterface $entityManager): Response
@@ -52,7 +33,7 @@ final class ContactMessageController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->render('contact_message/show.html.twig', [
+        return $this->render('admin/contact_message/show.html.twig', [
             'contact_message' => $contactMessage,
         ]);
     }
