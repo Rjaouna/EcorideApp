@@ -77,7 +77,11 @@
           data-name="{{ contact_message.name }}"
           data-token="{{ csrf_token('note' ~ contact_message.id) }}"
         >
-          Ajouter une note
+          {% if contact_message.note %}
+            Modifier la note
+            {% else %}
+            Ajouter une note
+          {% endif %}
         </button>
 
         

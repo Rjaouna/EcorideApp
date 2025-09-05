@@ -22,17 +22,26 @@
     </ul>
 
     <ul class="navbar-nav ms-auto">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" 
-           aria-haspopup="true" aria-expanded="false">
-          Mon compte
-        </a>
-        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="#">Connexion</a>
-          <a class="dropdown-item" href="#">Créer mon compte</a>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li>
-    </ul>
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center" href="{{ path('app_contact_message_index') }}">
+      <i class="bi bi-envelope {{ unreadCount > 0 ? 'text-danger' : '' }}"></i>
+      {% if unreadCount > 0 %}
+        <span class="badge bg-danger ms-1">{{ unreadCount }}</span>
+      {% endif %}
+    </a>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" 
+       aria-haspopup="true" aria-expanded="false">
+      Mon compte
+    </a>
+    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+      <a class="dropdown-item" href="#">Connexion</a>
+      <a class="dropdown-item" href="#">Créer mon compte</a>
+      <a class="dropdown-item" href="#">Something else here</a>
+    </div>
+  </li>
+</ul>
   </div>
 </nav>

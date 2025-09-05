@@ -57,23 +57,7 @@ final class ContactMessageController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_contact_message_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ContactMessage $contactMessage, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(ContactMessageType::class, $contactMessage);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_contact_message_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('contact_message/edit.html.twig', [
-            'contact_message' => $contactMessage,
-            'form' => $form,
-        ]);
-    }
 
     #[Route('/{id}/note', name: 'app_contact_message_note_update', methods: ['POST'])]
     public function updateNote(
