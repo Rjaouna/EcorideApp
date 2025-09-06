@@ -63,14 +63,17 @@
       <div class="dropdown-divider"></div>
 
       {# Profil (exemple) #}
-      <a class="dropdown-item" href="#">
+      <a class="dropdown-item" href="{{path('app_profile')}}">
         <i class="bi bi-person me-2"></i> Mon profil
       </a>
 
       {# L’action claire pour changer de mode #}
-      <a class="dropdown-item" href="#">
+      <form method="post" action="{{ path('app_switch_mode') }}">
+      <input type="hidden" name="_token" value="{{ csrf_token('switch_mode') }}">
+      <button type="submit" class="dropdown-item d-flex align-items-center">
         <i class="bi {{ switchIcon }} me-2"></i> {{ switchLabel }}
-      </a>
+      </button>
+       </form>
 
       <div class="dropdown-divider"></div>
 

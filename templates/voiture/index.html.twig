@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+{% block title %}Voitures{% endblock %}
+
+{% block body %}
+<section class="py-4">
+  <div class="container-fluid">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h1 class="h4 mb-1">Voitures</h1>
+        <p class="text-muted mb-0">Liste des véhicules enregistrés.</p>
+      </div>
+      <a href="{{ path('app_voiture_new') }}" class="btn btn-primary">Ajouter une voiture</a>
+    </div>
+
+    {% if voitures is empty %}
+      <div class="alert alert-info mb-0">Aucun véhicule pour le moment.</div>
+    {% else %}
+      <div class="row g-3">
+        {% for voiture in voitures %}
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-2"
+                       style="width:36px;height:36px;background:rgba(0,0,0,.06);">
+                    <strong>{{ (voiture.user.nom ?? '—')|slice(0,1)|upper }}</strong>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">
+                      {{ voiture.modele }}
+                    </div>
+                    <div class="text-muted small">
+                      Propriétaire : {{ voiture.user.nom ?? '—' }}
+                    </div>
+                  </div>
+                  <span class="badge bg-primary ms-2 text-uppercase">
+                    {{ voiture.energie }}
+                  </span>
+                </div>
+
+                <div class="mb-2">
+                  <div class="text-muted small">Immatriculation</div>
+                  <div class="fw-semibold text-uppercase">{{ voiture.immatriculation }}</div>
+                </div>
+
+                <div class="mb-2">
+                  <div class="text-muted small">Couleur</div>
+                  <div class="d-flex align-items-center gap-2">
+                    {% set colorText = voiture.couleur ?? '—' %}
+                    {% if colorText and colorText matches('/^#([A-Fa-f0-9]{3}){1,2}$/') %}
+                      <span class="d-inline-block rounded-circle border"
+                            style="width:14px;height:14px;background:{{ colorText }};"></span>
+                    {% endif %}
+                    <span>{{ colorText }}</span>
+                  </div>
+                </div>
+
+                <div class="mt-auto">
+                  <div class="text-muted small">Mise en circulation</div>
+                  <div>{{ voiture.immatriculationAt ? voiture.immatriculationAt|date('d/m/Y H:i') : '—' }}</div>
+                </div>
+              </div>
+
+              <div class="card-footer bg-white border-0 pt-0 pb-3">
+                <div class="d-flex gap-2">
+                  <a href="{{ path('app_voiture_show', {'id': voiture.id}) }}" class="btn btn-outline-secondary btn-sm">
+                    Voir
+                  </a>
+                  <a href="{{ path('app_voiture_edit', {'id': voiture.id}) }}" class="btn btn-primary btn-sm text-white">
+                    Modifier
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

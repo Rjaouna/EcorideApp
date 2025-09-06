@@ -1,0 +1,194 @@
+{# templates/profile/index.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+{% set isPassenger = app.user and 'ROLE_PASSAGER' in app.user.roles %}
+{% set isDriver    = app.user and 'ROLE_DRIVER'   in app.user.roles %}
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+		{% set mode = 'ROLE_DRIVER' in app.user.roles ? 'Conducteur' : 'Passager' %}
+        <h1 class="h4 text-primary mb-1">Mon profil — vous êtes en mode {{ mode }}</h1>
+
+		</h1>
+        <p class="text-muted mb-0">Informations de votre compte et de vos véhicules.</p>
+      </div>
+    </div>
+    <hr class="mt-4">
+  </div>
+</section>
+
+<div class="container my-4">
+  <div class="row g-4">
+
+    {# ====== Colonne gauche : infos + voitures ====== #}
+    <div class="col-lg-8">
+      {# Carte profil #}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          {% set u = app.user %}
+          {% set initial = (u.pseudo ?? u.nom ?? u.email)|slice(0,1)|upper %}
+
+          <div class="d-flex align-items-center mb-4">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3"
+                 style="width:56px;height:56px;background:rgba(0,0,0,.06);">
+              <span class="fw-bold">{{ initial }}</span>
+            </div>
+            <div>
+              <div class="h5 mb-0">{{ u.prenom }} {{ u.nom }}</div>
+              <div class="text-muted">
+                {% set badges = [] %}
+                {% if isDriver %}{% set badges = badges|merge(['<span class="badge bg-success me-1">Conducteur</span>']) %}{% endif %}
+                {% if isPassenger %}{% set badges = badges|merge(['<span class="badge bg-primary me-1">Passager</span>']) %}{% endif %}
+                {% if 'ROLE_ADMIN' in u.roles %}{% set badges = badges|merge(['<span class="badge bg-dark me-1">Admin</span>']) %}{% endif %}
+                {{ badges|join(' ')|raw }}
+                {% if u.isVerified %}<span class="badge bg-info text-dark">Email vérifié</span>{% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="text-muted small">Pseudo</div>
+              <div class="fw-semibold">{{ u.pseudo }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Sexe</div>
+              <div class="fw-semibold">{{ u.sexe }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="text-muted small">Email</div>
+              <div><a href="mailto:{{ u.email }}">{{ u.email }}</a></div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Téléphone</div>
+              <div><a href="tel:{{ u.telephone }}">{{ u.telephone }}</a></div>
+            </div>
+
+            <div class="col-12">
+              <div class="text-muted small">Adresse</div>
+              <div class="fw-semibold">{{ u.adresse }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="text-muted small">Date de naissance</div>
+              <div>{{ u.naissanceAt ? u.naissanceAt|date('d/m/Y') : '—' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Carte Mes voitures #}
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <strong>Mes voitures</strong>
+          <a href="{{ path('app_voiture_new') }}"
+             class="btn btn-sm btn-outline-primary {{ isPassenger ? 'disabled' : '' }}"
+             aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
+             {% if isPassenger %}tabindex="-1"{% endif %}>
+            Ajouter
+          </a>
+        </div>
+        <div class="card-body">
+          {% if voitures is empty %}
+            <div class="alert alert-info mb-0">Aucune voiture enregistrée.</div>
+          {% else %}
+            <div class="row g-3">
+              {% for voiture in voitures %}
+                {% set energieMap = {
+                  'electrique':'info','électrique':'info','hybride':'success',
+                  'essence':'primary','diesel':'secondary','gpl':'warning','gnv':'warning'
+                } %}
+                {% set energieClass = energieMap[voiture.energie|lower]|default('dark') %}
+
+                <div class="col-12 col-md-6">
+                  <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                          <div class="small text-muted">{{ voiture.marque.nom }}</div>
+                          <h6 class="mb-0">{{ voiture.modele }}</h6>
+                        </div>
+                        <span class="badge bg-{{ energieClass }} text-uppercase">{{ voiture.energie }}</span>
+                      </div>
+
+                      <dl class="row mb-0">
+                        <dt class="col-5 text-muted small">Immatriculation</dt>
+                        <dd class="col-7 fw-semibold text-uppercase">{{ voiture.immatriculation }}</dd>
+
+                        <dt class="col-5 text-muted small">Couleur</dt>
+                        <dd class="col-7 d-flex align-items-center gap-2">
+                          <span class="swatch" style="background: {{ voiture.couleur }};"></span>
+                          <span>{{ voiture.couleur }}</span>
+                        </dd>
+
+                        <dt class="col-5 text-muted small">Mise en circulation</dt>
+                        <dd class="col-7">
+                          {{ voiture.immatriculationAt ? voiture.immatriculationAt|date('d/m/Y') : '—' }}
+                        </dd>
+                      </dl>
+
+                      <div class="mt-3 d-flex gap-2">
+                        <a href="{{ path('app_voiture_show', {'id': voiture.id}) }}"
+                           class="btn btn-outline-secondary btn-sm {{ isPassenger ? 'disabled' : '' }}"
+                           aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
+                           {% if isPassenger %}tabindex="-1"{% endif %}>
+                          Voir
+                        </a>
+                        <a href="{{ path('app_voiture_edit', {'id': voiture.id}) }}"
+                           class="btn btn-primary btn-sm text-white {{ isPassenger ? 'disabled' : '' }}"
+                           aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
+                           {% if isPassenger %}tabindex="-1"{% endif %}>
+                          Modifier
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ====== Colonne droite : Actions ====== #}
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Actions</strong>
+        </div>
+        <div class="card-body d-grid gap-2">
+          <a href="#" class="btn btn-primary text-white">Modifier mon profil</a>
+
+          <a href="{{ path('app_voiture_new') }}"
+             class="btn btn-outline-primary {{ isPassenger ? 'disabled' : '' }}"
+             aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
+             {% if isPassenger %}tabindex="-1"{% endif %}>
+            Ajouter une voiture
+          </a>
+
+          <form method="post" action="{{ path('app_switch_mode') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('switch_mode') }}">
+            <button type="submit" class="btn btn-outline-secondary w-100">
+              <i class="bi {{ isDriver ? 'bi-person' : 'bi-car-front' }} me-2"></i>
+              {{ isDriver ? 'Passer en mode Passager' : 'Passer en mode Conducteur' }}
+            </button>
+          </form>
+
+          <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">Se déconnecter</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .swatch{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:inline-block}
+</style>
+{% endblock %}

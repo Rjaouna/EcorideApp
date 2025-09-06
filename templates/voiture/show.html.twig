@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Voiture #{{ voiture.id }} – {{ voiture.marque.nom }} {{ voiture.modele }}{% endblock %}
+
+{% block body %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 text-primary mb-1">
+          {{ voiture.marque.nom }} {{ voiture.modele }}
+        </h1>
+        <p class="text-muted mb-0">Fiche détaillée du véhicule.</p>
+      </div>
+      
+    </div>
+    <hr class="mt-4">
+  </div>
+</section>
+
+<div class="container my-4">
+  <div class="row g-4">
+
+    {# --- Carte détails --- #}
+    <div class="col-lg-8">
+      {% set energieMap = {
+        'electrique':'info','électrique':'info','hybride':'success',
+        'essence':'primary','diesel':'secondary','gpl':'warning','gnv':'warning'
+      } %}
+      {% set energieClass = energieMap[voiture.energie|lower]|default('dark') %}
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <div class="small text-muted">Propriétaire</div>
+              <div class="fw-semibold">{{ voiture.user.nom ?? '—' }}</div>
+            </div>
+            <span class="badge bg-{{ energieClass }} text-uppercase">
+              {{ voiture.energie }}
+            </span>
+          </div>
+
+          <dl class="row mb-0">
+            <dt class="col-sm-5 text-muted small">Marque</dt>
+            <dd class="col-sm-7 fw-semibold">{{ voiture.marque.nom }}</dd>
+
+            <dt class="col-sm-5 text-muted small">Modèle</dt>
+            <dd class="col-sm-7">{{ voiture.modele }}</dd>
+
+            <dt class="col-sm-5 text-muted small">Immatriculation</dt>
+            <dd class="col-sm-7">
+              <span class="plate text-uppercase">{{ voiture.immatriculation }}</span>
+            </dd>
+
+            <dt class="col-sm-5 text-muted small">Couleur</dt>
+            <dd class="col-sm-7 d-flex align-items-center gap-2">
+              <span class="swatch" style="background: {{ voiture.couleur }};"></span>
+              <span>{{ voiture.couleur }}</span>
+            </dd>
+
+            <dt class="col-sm-5 text-muted small">Mise en circulation</dt>
+            <dd class="col-sm-7">
+              {{ voiture.immatriculationAt ? voiture.immatriculationAt|date('d/m/Y H:i') : '—' }}
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    {# --- Carte actions --- #}
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Actions</strong>
+        </div>
+        <div class="card-body d-grid gap-2">
+          <a href="{{ path('app_voiture_edit', {'id': voiture.id}) }}" class="btn btn-primary text-white">
+            Modifier
+          </a>
+          {{ include('voiture/_delete_form.html.twig') }}
+          <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary">
+            Mon profil
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .plate{display:inline-block;padding:.25rem .5rem;border:1px solid #ced4da;border-radius:.25rem;background:#f8f9fa;font-weight:600;letter-spacing:.5px}
+  .swatch{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:inline-block}
+</style>
+{% endblock %}
