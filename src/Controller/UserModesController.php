@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\VoitureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserModesController extends AbstractController
 {
 	#[Route('/account/switch-mode', name: 'app_switch_mode', methods: ['POST'])]
-	public function switchMode(Request $request, EntityManagerInterface $em, Security $security): Response
+	public function switchMode(Request $request, EntityManagerInterface $em, Security $security, VoitureRepository $voiture): Response
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -25,6 +26,16 @@ class UserModesController extends AbstractController
 		$user   = $this->getUser();
 		$roles  = $user->getRoles();
 		$isDriver = \in_array('ROLE_DRIVER', $roles, true);
+
+		// SI on veut passer en conducteur → vérifier qu’il a au moins une voiture
+		if (!$isDriver) {
+			$carCount = $voiture->count(['user' => $user]);
+			if ($carCount === 0) {
+				$this->addFlash('warning', 'Ajoutez au moins une voiture avant de passer en mode conducteur.');
+				return $this->redirectToRoute('app_voiture_new', [], Response::HTTP_SEE_OTHER);
+			}
+		}
+
 
 		// on retire uniquement les rôles "mode"
 		$preserved = \array_values(\array_filter(

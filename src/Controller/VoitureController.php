@@ -25,6 +25,10 @@ final class VoitureController extends AbstractController
     #[Route('/new', name: 'app_voiture_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_DRIVER')) {
+            $this->addFlash('warning', 'Vous devez être en mode conducteur pour ajouter une voiture.');
+            return $this->redirectToRoute('app_profile');
+        }
         $voiture = new Voiture();
         $form = $this->createForm(VoitureType::class, $voiture);
         $form->handleRequest($request);
@@ -46,6 +50,10 @@ final class VoitureController extends AbstractController
     #[Route('/{id}', name: 'app_voiture_show', methods: ['GET'])]
     public function show(Voiture $voiture): Response
     {
+        if (!$this->isGranted('ROLE_DRIVER')) {
+            $this->addFlash('warning', 'Vous devez être en mode conducteur pour gérer une voiture.');
+            return $this->redirectToRoute('app_profile');
+        }
         return $this->render('voiture/show.html.twig', [
             'voiture' => $voiture,
         ]);
@@ -54,6 +62,10 @@ final class VoitureController extends AbstractController
     #[Route('/{id}/edit', name: 'app_voiture_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Voiture $voiture, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_DRIVER')) {
+            $this->addFlash('warning', 'Vous devez être en mode conducteur pour gérer une voiture.');
+            return $this->redirectToRoute('app_profile');
+        }
         $form = $this->createForm(VoitureType::class, $voiture);
         $form->handleRequest($request);
 
