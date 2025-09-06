@@ -39,6 +39,9 @@ class Voiture
     #[ORM\Column]
     private ?int $nombrePlaces = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $isLocked = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -136,6 +139,18 @@ class Voiture
     public function setNombrePlaces(int $nombrePlaces): static
     {
         $this->nombrePlaces = $nombrePlaces;
+
+        return $this;
+    }
+
+    public function isLocked(): ?bool
+    {
+        return $this->isLocked;
+    }
+
+    public function setIsLocked(?bool $isLocked): static
+    {
+        $this->isLocked = $isLocked;
 
         return $this;
     }

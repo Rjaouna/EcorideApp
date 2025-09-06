@@ -25,10 +25,10 @@ final class VoitureController extends AbstractController
     #[Route('/new', name: 'app_voiture_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        if (!$this->isGranted('ROLE_DRIVER')) {
-            $this->addFlash('warning', 'Vous devez être en mode conducteur pour ajouter une voiture.');
-            return $this->redirectToRoute('app_profile');
-        }
+        // if (!$this->isGranted('ROLE_DRIVER')) {
+        //     $this->addFlash('warning', 'Vous devez être en mode conducteur pour ajouter une voiture.');
+        //     return $this->redirectToRoute('app_profile');
+        // }
         $voiture = new Voiture();
         $form = $this->createForm(VoitureType::class, $voiture);
         $form->handleRequest($request);
