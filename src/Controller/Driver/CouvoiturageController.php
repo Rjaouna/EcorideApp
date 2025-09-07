@@ -17,8 +17,9 @@ final class CouvoiturageController extends AbstractController
     #[Route(name: 'app_couvoiturage_index', methods: ['GET'])]
     public function index(CouvoiturageRepository $couvoiturageRepository): Response
     {
-        return $this->render('couvoiturage/index.html.twig', [
-            'couvoiturages' => $couvoiturageRepository->findAll(),
+        $user = $this->getUser();
+        return $this->render('driver/couvoiturage/index.html.twig', [
+            'couvoiturages' => $couvoiturageRepository->findBy(['driver' => $user]),
         ]);
     }
 
@@ -28,15 +29,18 @@ final class CouvoiturageController extends AbstractController
         $couvoiturage = new Couvoiturage();
         $form = $this->createForm(CouvoiturageType::class, $couvoiturage);
         $form->handleRequest($request);
+        $driver = $this->getUser();
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $couvoiturage->setDriver($driver);
+            $couvoiturage->setStatut('PLANIFIER');
             $entityManager->persist($couvoiturage);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_couvoiturage_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('couvoiturage/new.html.twig', [
+        return $this->render('driver/couvoiturage/new.html.twig', [
             'couvoiturage' => $couvoiturage,
             'form' => $form,
         ]);
@@ -45,7 +49,7 @@ final class CouvoiturageController extends AbstractController
     #[Route('/{id}', name: 'app_couvoiturage_show', methods: ['GET'])]
     public function show(Couvoiturage $couvoiturage): Response
     {
-        return $this->render('couvoiturage/show.html.twig', [
+        return $this->render('driver/couvoiturage/show.html.twig', [
             'couvoiturage' => $couvoiturage,
         ]);
     }
@@ -62,7 +66,7 @@ final class CouvoiturageController extends AbstractController
             return $this->redirectToRoute('app_couvoiturage_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('couvoiturage/edit.html.twig', [
+        return $this->render('driver/couvoiturage/edit.html.twig', [
             'couvoiturage' => $couvoiturage,
             'form' => $form,
         ]);

@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des covoiturages{% endblock %}
+
+{% block body %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 text-primary mb-1">Liste des covoiturages</h1>
+        <p class="text-muted mb-0">Tous les trajets disponibles dans la plateforme.</p>
+      </div>
+      <a href="{{ path('app_couvoiturage_new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Nouveau trajet
+      </a>
+    </div>
+    <hr class="mt-4">
+  </div>
+</section>
+
+<div class="container my-4">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Id</th>
+              <th>Date départ</th>
+              <th>Lieu départ</th>
+              <th>Date arrivée</th>
+              <th>Lieu arrivée</th>
+              <th>Statut</th>
+              <th>Places</th>
+              <th>Prix (€)</th>
+              <th>Créé le</th>
+              <th>Modifié le</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for couvoiturage in couvoiturages %}
+            <tr>
+              <td>{{ couvoiturage.id }}</td>
+              <td>{{ couvoiturage.departAt ? couvoiturage.departAt|date('d/m/Y H:i') : '-' }}</td>
+              <td>{{ couvoiturage.lieuDepart }}</td>
+              <td>{{ couvoiturage.arriveeAt ? couvoiturage.arriveeAt|date('d/m/Y H:i') : '-' }}</td>
+              <td>{{ couvoiturage.lieuArrivee }}</td>
+              <td>
+                <span class="badge 
+                  {% if couvoiturage.statut == 'PLANNED' %}bg-secondary
+                  {% elseif couvoiturage.statut == 'PUBLISHED' %}bg-success
+                  {% elseif couvoiturage.statut == 'FULL' %}bg-warning text-dark
+                  {% elseif couvoiturage.statut == 'CANCELLED' %}bg-danger
+                  {% else %}bg-info{% endif %}
+                ">
+                  {{ couvoiturage.statut }}
+                </span>
+              </td>
+              <td>{{ couvoiturage.nbPlace }}</td>
+              <td>{{ couvoiturage.prixPersonne }}</td>
+              <td>{{ couvoiturage.createdAt ? couvoiturage.createdAt|date('d/m/Y H:i') : '-' }}</td>
+              <td>{{ couvoiturage.updatedAt ? couvoiturage.updatedAt|date('d/m/Y H:i') : '-' }}</td>
+              <td class="text-center">
+                <a href="{{ path('app_couvoiturage_show', {'id': couvoiturage.id}) }}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye"></i> Voir
+                </a>
+                <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil"></i> Modifier
+                </a>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="11" class="text-center text-muted">Aucun covoiturage trouvé</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

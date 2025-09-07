@@ -53,6 +53,10 @@ class Couvoiturage
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'couvoiturages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Voiture $voiture = null;
+
     public function __construct()
     {
         $this->passagers = new ArrayCollection();
@@ -216,5 +220,17 @@ class Couvoiturage
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function getVoiture(): ?Voiture
+    {
+        return $this->voiture;
+    }
+
+    public function setVoiture(?Voiture $voiture): static
+    {
+        $this->voiture = $voiture;
+
+        return $this;
     }
 }

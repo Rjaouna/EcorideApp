@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail du covoiturage #{{ couvoiturage.id }}{% endblock %}
+
+{% block body %}
+{# Bandeau titre #}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 text-primary mb-1">Covoiturage {{ couvoiturage.lieuDepart }} <i class="bi bi-arrow-right"></i> {{ couvoiturage.lieuarrivee }}</h1>
+        <p class="text-muted mb-0">Détails du trajet et actions disponibles.</p>
+      </div>
+    </div>
+    <hr class="mt-4">
+    <div class="row g-3 bg-light pt-2">
+            <div class="col-md-4">
+            
+              <div class="text-muted small">Statut</div>
+              {% set s = couvoiturage.statut %}
+              {% set badgeClass =
+                s == 'PUBLISHED' ? 'bg-success' :
+                (s == 'FULL' ? 'bg-warning text-dark' :
+                (s == 'CANCELLED' ? 'bg-danger' :
+                (s == 'PLANNED' ? 'bg-secondary' : 'bg-info'))) %}
+              <span class="badge {{ badgeClass }} fw-semibold">{{ s }}</span>
+            </div>
+
+            <div class="col-md-4">
+              <div class="text-muted small">Places</div>
+              <div class="fw-semibold">{{ couvoiturage.nbPlace }}</div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="text-muted small">Prix par personne (€)</div>
+              <div class="fw-semibold">{{ couvoiturage.prixPersonne }}</div>
+            </div>
+            </div>
+  </div>
+</section>
+
+<div class="container my-4">
+  <div class="row g-4">
+
+    {# ===== Colonne gauche : détails du trajet ===== #}
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        
+                
+
+
+
+
+        <div class="card-body">
+          <div class="row g-3">
+         
+<p class="mb-3">
+  Ce covoiturage se fera avec 
+  <span class="fw-semibold fs-5">
+    🚗 {{ couvoiturage.voiture.marque.nom }} {{ couvoiturage.voiture.modele }}
+  </span>
+  <br>
+  <small class="text-muted">Assuré par</small>
+  {% if couvoiturage.driver is defined %}
+    <span class="fw-semibold fs-5 ms-1">
+      👤 {{ couvoiturage.driver.prenom }} {{ couvoiturage.driver.nom }}
+    </span>
+  {% endif %}
+</p>
+
+
+            <div class="col-md-6">
+              <div class="text-muted small">Date de départ</div>
+              <div class="fw-semibold">
+                {{ couvoiturage.departAt ? couvoiturage.departAt|date('d/m/Y H:i') : '—' }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Date d’arrivée</div>
+              <div class="fw-semibold">
+                {{ couvoiturage.arriveeAt ? couvoiturage.arriveeAt|date('d/m/Y H:i') : '—' }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="text-muted small">Lieu de départ</div>
+              <div class="fw-semibold">{{ couvoiturage.lieuDepart }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Lieu d’arrivée</div>
+              <div class="fw-semibold">{{ couvoiturage.lieuArrivee }}</div>
+            </div>
+
+          
+
+            <div class="col-md-6">
+              <div class="text-muted small">Créé le</div>
+              <div class="fw-semibold">
+                {{ couvoiturage.createdAt ? couvoiturage.createdAt|date('d/m/Y H:i') : '—' }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Modifié le</div>
+              <div class="fw-semibold">
+                {{ couvoiturage.updatedAt ? couvoiturage.updatedAt|date('d/m/Y H:i') : '—' }}
+              </div>
+            </div>
+
+           
+
+            {% if couvoiturage.passagers is defined %}
+              <div class="col-12">
+                <div class="text-muted small mb-1">Passagers</div>
+                {% if couvoiturage.passagers|length == 0 %}
+                  <div class="text-muted">Aucun passager inscrit.</div>
+                {% else %}
+                  <ul class="list-unstyled mb-0">
+                    {% for p in couvoiturage.passagers %}
+                      <li>
+                        <i class="bi bi-person"></i>
+                        {{ p.prenom ~ ' ' ~ p.nom }} <span class="text-muted">(#{{ p.id }})</span>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            {% endif %}
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ===== Colonne droite : actions ===== #}
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Actions</strong>
+        </div>
+        <div class="card-body d-grid gap-2">
+          <a href="{{ path('app_couvoiturage_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+          </a>
+          {% if app.user == couvoiturage.driver %}
+        <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}" class="btn btn-primary text-white">
+            <i class="bi bi-pencil"></i> Modifier
+        </a>
+        {% else %}
+        <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}" class="btn btn-primary text-white">
+            Participer à ce couvoiturage
+        </a>
+        {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

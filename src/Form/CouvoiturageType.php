@@ -2,11 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\Couvoiturage;
 use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Voiture;
+use App\Entity\Couvoiturage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CouvoiturageType extends AbstractType
@@ -22,24 +23,13 @@ class CouvoiturageType extends AbstractType
                 'widget' => 'single_text'
             ])
             ->add('lieuArrivee')
-            ->add('statut')
+            ->add('voiture', EntityType::class, [
+                'class' => Voiture::class,
+                'choice_label' => 'immatriculation',
+            ])
             ->add('nbPlace')
             ->add('prixPersonne')
-            ->add('createdAt', null, [
-                'widget' => 'single_text'
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text'
-            ])
-            ->add('driver', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
-            ])
-            ->add('passagers', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
-                'multiple' => true,
-            ])
+
         ;
     }
 

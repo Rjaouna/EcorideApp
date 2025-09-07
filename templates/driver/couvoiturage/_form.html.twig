@@ -1,0 +1,33 @@
+{{ form_start(form) }}
+<div class="row g-3">
+    <div class="col-md-6">
+        {{ form_row(form.departAt, { 'label': 'Date de départ' }) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.arriveeAt, { 'label': 'Date d\'arrivée' }) }}
+    </div>
+
+    <div class="col-md-6">
+        {{ form_row(form.lieuDepart, { 'label': 'Lieu de départ' }) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.lieuArrivee, { 'label': 'Lieu d\'arrivée' }) }}
+    </div>
+
+    <div class="col-md-6">
+        {{ form_row(form.nbPlace, { 'label': 'Nombre de places' }) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.voiture, { 'label': 'Immatriculation voiture' }) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.prixPersonne, { 'label': 'Prix par personne (€)' }) }}
+    </div>
+
+    <div class="col-12 text-center">
+        <button class="btn btn-primary">
+            {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
+</div>
+{{ form_end(form) }}
