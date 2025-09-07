@@ -1,0 +1,165 @@
+{# templates/preference_utilisateur/index.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}Mes préférences{% endblock %}
+
+{% block body %}
+{% set isPassenger = app.user and 'ROLE_PASSAGER' in app.user.roles %}
+{% set isDriver    = app.user and 'ROLE_DRIVER'   in app.user.roles %}
+{% set mode        = isDriver ? 'Conducteur' : 'Passager' %}
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 text-primary mb-1">Mes préférences — vous êtes en mode {{ mode }}</h1>
+        <p class="text-muted mb-0">Définissez vos règles de confort (tabac, animaux, conversation, musique, etc.).</p>
+      </div>
+    </div>
+    <hr class="mt-4">
+  </div>
+</section>
+
+{# On récupère la préférence de l'utilisateur courant depuis la liste fournie #}
+{% set pref = null %}
+{% if preference_utilisateurs is defined and preference_utilisateurs is not empty %}
+  {% for p in preference_utilisateurs %}
+    {% if p.user and app.user and p.user.id == app.user.id %}
+      {% set pref = p %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{# Mappings pour l’affichage en badge #}
+{% set poliMap = {
+  'autoriser': ['success','Autorisé'],
+  'interdire': ['danger','Interdit'],
+  'discuter' : ['warning','À discuter']
+} %}
+{% set convMap = {
+  'discret': ['secondary','Discret'],
+  'normal' : ['primary','Normal'],
+  'bavard' : ['info','Bavard']
+} %}
+{% set musicMap = {
+  'faible' : ['secondary','Faible'],
+  'moyenne': ['primary','Moyenne'],
+  'forte'  : ['dark','Forte']
+} %}
+{% set foodMap = {
+  'oui'  : ['success','Oui'],
+  'arret': ['warning','À l’arrêt'],
+  'non'  : ['secondary','Non']
+} %}
+
+<div class="container my-4">
+  <div class="row g-4">
+
+    {# ===== Colonne gauche : carte des préférences ===== #}
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <strong>Mes préférences</strong>
+          {% if pref %}
+            <a href="{{ path('app_preference_utilisateur_edit', {'id': pref.id}) }}" class="btn btn-sm btn-primary text-white">
+              <i class="bi bi-pencil-square me-1"></i> Modifier
+            </a>
+          {% else %}
+            <a href="{{ path('app_preference_utilisateur_new') }}" class="btn btn-sm btn-primary text-white">
+              <i class="bi bi-plus-circle me-1"></i> Créer
+            </a>
+          {% endif %}
+        </div>
+
+        <div class="card-body p-4">
+          {% if not pref %}
+            <div class="alert alert-info mb-0">
+              Vous n’avez pas encore défini vos préférences.
+              <a class="alert-link" href="{{ path('app_preference_utilisateur_new') }}">Créer maintenant</a>.
+            </div>
+          {% else %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="text-muted small">Tabac</div>
+                {% set t = poliMap[pref.politiqueTabac|default('')]|default(null) %}
+                {% if t %}
+                  <span class="badge bg-{{ t[0] }}">{{ t[1] }}</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <div class="text-muted small">Animaux</div>
+                {% set a = poliMap[pref.politiqueAnimaux|default('')]|default(null) %}
+                {% if a %}
+                  <span class="badge bg-{{ a[0] }}">{{ a[1] }}</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <div class="text-muted small">Conversation</div>
+                {% set c = convMap[pref.niveauConversation|default('')]|default(null) %}
+                {% if c %}
+                  <span class="badge bg-{{ c[0] }}">{{ c[1] }}</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <div class="text-muted small">Musique</div>
+                {% set m = musicMap[pref.niveauMusique|default('')]|default(null) %}
+                {% if m %}
+                  <span class="badge bg-{{ m[0] }}">{{ m[1] }}</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <div class="text-muted small">Nourriture</div>
+                {% if pref.autoriseNourriture %}
+                  <span class="badge bg-primary">Oui</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <div class="text-muted small">Boissons</div>
+                {% if pref.autoriseBoissons %}
+                  <span class="badge bg-primary">Oui</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <div class="text-muted small">Bagages max</div>
+                {% if pref.tailleMaxBagages is not null %}
+                  <span class="fw-semibold">{{ pref.tailleMaxBagages }}&nbsp;kg</span>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ===== Colonne droite : actions ===== #}
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Actions</strong>
+        </div>
+        <div class="card-body d-grid gap-2">
+          {% if pref %}
+            <a href="{{ path('app_preference_utilisateur_edit', {'id': pref.id}) }}" class="btn btn-primary text-white">
+              Modifier mes préférences
+            </a>
+          {% else %}
+            <a href="{{ path('app_preference_utilisateur_new') }}" class="btn btn-primary text-white">
+              Gérer mes préférences
+            </a>
+          {% endif %}
+
+          <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary">Retour au profil</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

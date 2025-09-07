@@ -1,0 +1,78 @@
+{# templates/preference_utilisateur/_form.html.twig #}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form) }}
+  {{ form_errors(form) }}
+
+  <div class="row g-4">
+    {# Colonne 1 #}
+    <div class="col-12 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white">
+          <strong>Règles d’acceptation</strong>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            {{ form_row(form.politiqueTabac, {'label': 'Fumeur'}) }}
+          </div>
+          <div class="mb-0">
+            {{ form_row(form.politiqueAnimaux, {'label': 'Animaux'}) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Colonne 2 #}
+    <div class="col-12 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white">
+          <strong>Ambiance à bord</strong>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            {{ form_row(form.niveauConversation, {'label': 'Niveau de conversation'}) }}
+          </div>
+          <div class="mb-0">
+            {{ form_row(form.niveauMusique, {'label': 'Niveau de musique'}) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Colonne 1 (ligne suivante) #}
+    <div class="col-12 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white">
+          <strong>Consommation à bord</strong>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            {{ form_row(form.autoriseNourriture, {'label': 'Nourriture'}) }}
+          </div>
+          <div class="mb-0">
+            {{ form_row(form.autoriseBoissons, {'label': 'Boissons'}) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Colonne 2 (ligne suivante) #}
+    <div class="col-12 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white">
+          <strong>Bagages</strong>
+        </div>
+        <div class="card-body">
+          {{ form_row(form.tailleMaxBagages, {'label': 'Taille max des bagages'}) }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mt-4">
+    <button class="btn btn-primary text-white">
+      {{ button_label|default('Enregistrer') }}
+    </button>
+  </div>
+
+{{ form_end(form) }}

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Voiture;
 use App\Form\VoitureType;
+use App\Repository\PreferenceUtilisateurRepository;
 use App\Repository\VoitureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,12 +24,16 @@ final class VoitureController extends AbstractController
     }
 
     #[Route('/new', name: 'app_voiture_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PreferenceUtilisateurRepository $preference_utilisateur): Response
     {
-        // if (!$this->isGranted('ROLE_DRIVER')) {
-        //     $this->addFlash('warning', 'Vous devez être en mode conducteur pour ajouter une voiture.');
-        //     return $this->redirectToRoute('app_profile');
-        // }
+        $user   = $this->getUser();
+        $notSetParam = $preference_utilisateur->count(['user' => $user]);
+        if ($notSetParam === 0) {
+            $this->addFlash('warning', 'Veuillez remlir vos préférences');
+            return $this->redirectToRoute('app_preference_utilisateur_new', [], Response::HTTP_SEE_OTHER);
+        }
+
+
         $voiture = new Voiture();
         $form = $this->createForm(VoitureType::class, $voiture);
         $form->handleRequest($request);

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\PreferenceUtilisateurRepository;
 use App\Repository\VoitureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -14,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserModesController extends AbstractController
 {
 	#[Route('/account/switch-mode', name: 'app_switch_mode', methods: ['POST'])]
-	public function switchMode(Request $request, EntityManagerInterface $em, Security $security, VoitureRepository $voiture): Response
+	public function switchMode(Request $request, EntityManagerInterface $em, Security $security, PreferenceUtilisateurRepository $preference_utilisateur): Response
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -29,10 +30,18 @@ class UserModesController extends AbstractController
 
 		// SI on veut passer en conducteur → vérifier qu’il a au moins une voiture
 		if (!$isDriver) {
-			$carCount = $voiture->count(['user' => $user]);
-			if ($carCount === 0) {
-				$this->addFlash('warning', 'Ajoutez au moins une voiture avant de passer en mode conducteur.');
-				return $this->redirectToRoute('app_voiture_new', [], Response::HTTP_SEE_OTHER);
+			$notSetParam = $preference_utilisateur->count(['user' => $user]);
+
+			if ($notSetParam === 0) {
+				$this->addFlash('warning', 'Veuillez remplir vos préférnces.');
+				return $this->redirectToRoute('app_preference_utilisateur_new', [], Response::HTTP_SEE_OTHER);
+			}
+		} else {
+			// $preferenceRepo est un PreferenceUtilisateurRepository
+			$pref = $preference_utilisateur->findOneBy(['user' => $user]);
+			if ($pref) {
+				$em->remove($pref);
+				$em->flush();
 			}
 		}
 
