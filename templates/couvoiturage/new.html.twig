@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Couvoiturage{% endblock %}
+
+{% block body %}
+    <h1>Create new Couvoiturage</h1>
+
+    {{ include('couvoiturage/_form.html.twig') }}
+
+    <a href="{{ path('app_couvoiturage_index') }}">back to list</a>
+{% endblock %}

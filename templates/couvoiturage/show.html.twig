@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Couvoiturage{% endblock %}
+
+{% block body %}
+    <h1>Couvoiturage</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ couvoiturage.id }}</td>
+            </tr>
+            <tr>
+                <th>DepartAt</th>
+                <td>{{ couvoiturage.departAt ? couvoiturage.departAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>LieuDepart</th>
+                <td>{{ couvoiturage.lieuDepart }}</td>
+            </tr>
+            <tr>
+                <th>ArriveeAt</th>
+                <td>{{ couvoiturage.arriveeAt ? couvoiturage.arriveeAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>LieuArrivee</th>
+                <td>{{ couvoiturage.lieuArrivee }}</td>
+            </tr>
+            <tr>
+                <th>Statut</th>
+                <td>{{ couvoiturage.statut }}</td>
+            </tr>
+            <tr>
+                <th>NbPlace</th>
+                <td>{{ couvoiturage.nbPlace }}</td>
+            </tr>
+            <tr>
+                <th>PrixPersonne</th>
+                <td>{{ couvoiturage.prixPersonne }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ couvoiturage.createdAt ? couvoiturage.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ couvoiturage.updatedAt ? couvoiturage.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_couvoiturage_index') }}">back to list</a>
+
+    <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}">edit</a>
+
+    {{ include('couvoiturage/_delete_form.html.twig') }}
+{% endblock %}
