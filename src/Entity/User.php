@@ -47,8 +47,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $naissanceAt = null;
+    #[ORM\Column(type: 'date')]
+    private ?\DateTimeInterface $naissanceAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo = null;
@@ -202,12 +202,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNaissanceAt(): ?\DateTimeImmutable
+    public function getNaissanceAt(): ?\DateTimeInterface
     {
         return $this->naissanceAt;
     }
 
-    public function setNaissanceAt(\DateTimeImmutable $naissanceAt): static
+    public function setNaissanceAt(\DateTimeInterface $naissanceAt): static
     {
         $this->naissanceAt = $naissanceAt;
 
