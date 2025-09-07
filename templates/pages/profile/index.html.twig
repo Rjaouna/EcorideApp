@@ -5,6 +5,8 @@
 {% block body %}
 {% set isPassenger = app.user and 'ROLE_PASSAGER' in app.user.roles %}
 {% set isDriver    = app.user and 'ROLE_DRIVER'   in app.user.roles %}
+{% set accesRide = isDriver ? '' : 'd-none' %}
+
 
 <section class="py-5 bg-light">
   <div class="container">
@@ -82,8 +84,17 @@
         </div>
       </div>
 
-      {# Carte Mes voitures #}
-      <div class="card border-0 shadow-sm">
+
+
+
+
+
+
+
+    {% set isPassagerBloc = app.user and 'ROLE_PASSAGER' in app.user.roles ? '' : 'd-none' %}
+    {% set isDriverBloc    = app.user and 'ROLE_DRIVER'   in app.user.roles ? '' : 'd-none' %}
+      {# Carte réservée pour l'utilisateur en mode DRIVER #}
+      <div class="card border-0 shadow-sm {{isDriverBloc}}">
   <div class="card-header bg-white d-flex justify-content-between align-items-center">
     <strong>Mes voitures</strong>
 	{% if isPassenger %}
@@ -151,8 +162,64 @@
     {% endif %}
   </div>
 </div>
+{# Carte réservée pour l'utilisateur en mode DRIVER #}
+      <div class="card border-0  {{isPassagerBloc}}">
+<div class="row g-3">
+  {% for t in participations %}
+    {% set conducteur = t.driver ?? t.user %}
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="fw-bold mb-1">
+              {{ t.lieuDepart }} → {{ t.lieuArrivee }}
+            </h5>
+            <p class="text-muted small mb-2">
+              {{ t.departAt ? t.departAt|date('d/m/Y H:i') : '—' }}
+            </p>
+            <p class="fw-bold text-primary mb-0">
+              {{ t.prixPersonne }} €
+            </p>
+          </div>
+
+          <div class="mt-3">
+            <p class="small text-muted mb-0">Conducteur :</p>
+            <p class="fw-bold mb-0">
+              {{ conducteur ? (conducteur.prenom ~ ' ' ~ conducteur.nom) : '—' }}
+            </p>
+          </div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+          {% set s = t.statut %}
+          {% set badgeClass =
+            s == 'PUBLISHED' ? 'bg-success' :
+            (s == 'FULL' ? 'bg-warning text-dark' :
+            (s == 'CANCELLED' ? 'bg-danger' :
+            (s == 'PLANNED' ? 'bg-secondary' : 'bg-info'))) %}
+          <span class="badge {{ badgeClass }}">{{ s }}</span>
+
+          <a href="{{ path('app_couvoiturage_show', {'id': t.id}) }}"
+             class="btn btn-sm btn-outline-secondary">
+            Voir
+          </a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-12">
+      <div class="alert alert-info mb-0">Aucun trajet réservé.</div>
+    </div>
+  {% endfor %}
+</div>
 
     </div>
+    </div>
+
+
+
+
+
+
 
     {# ====== Colonne droite : Actions ====== #}
     <div class="col-lg-4">
@@ -161,14 +228,16 @@
           <strong>Actions</strong>
         </div>
         <div class="card-body d-grid gap-2">
-          <a href="#" class="btn btn-primary text-white">Modifier mon profil</a>
-          <a href="{{path('app_preference_utilisateur_index')}}" class="btn btn-warning text-white">Mes préférences</a>
-
+          <a href="#" class="btn btn-outline-secondary"><i class="bi bi-person me-1" aria-hidden="true"></i> Modifier mon profil</a>
+          <a href="{{path('app_preference_utilisateur_index')}}" class="btn btn-outline-secondary"><i class="bi bi-sliders2 me-1" aria-hidden="true"></i> Mes préférences</a>
+<a class="btn btn-outline-secondary  {{accesRide}}" href="{{path('app_couvoiturage_index')}}">
+         Mes couvoiturage
+      </a>
           <a href="{{ path('app_voiture_new') }}"
-             class="btn btn-outline-primary {{ isPassenger ? 'disabled' : '' }}"
+             class="btn btn-outline-secondary {{ isPassenger ? 'disabled' : '' }}"
              aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
              {% if isPassenger %}tabindex="-1"{% endif %}>
-            Ajouter une voiture
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Ajouter une voiture
           </a>
 
           <form method="post" action="{{ path('app_switch_mode') }}">
@@ -179,7 +248,9 @@
             </button>
           </form>
 
-          <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">Se déconnecter</a>
+      
+
+          <a href="{{ path('app_logout') }}" class="btn btn-outline-danger"><i class="bi bi-door-closed"></i> Se déconnecter</a>
         </div>
       </div>
     </div>

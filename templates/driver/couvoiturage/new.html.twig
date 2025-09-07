@@ -1,11 +1,127 @@
+{# templates/driver/couvoiturage/new.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}New Couvoiturage{% endblock %}
+{% block title %}Nouveau covoiturage{% endblock %}
 
 {% block body %}
-    <h1>Create new Couvoiturage</h1>
+{% set isPassenger = app.user and 'ROLE_PASSAGER' in app.user.roles %}
+{% set isDriver    = app.user and 'ROLE_DRIVER'   in app.user.roles %}
+{% set mode        = isDriver ? 'Conducteur' : 'Passager' %}
+{% set accesRide   = isDriver ? '' : 'd-none' %}
 
-    {{ include('driver/couvoiturage/_form.html.twig') }}
+{# Bandeau titre #}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 text-primary mb-1">Créer un covoiturage — mode {{ mode }}</h1>
+        <p class="text-muted mb-0">Renseignez les informations du trajet puis publiez-le.</p>
+      </div>
+    </div>
+    <hr class="mt-4">
+  </div>
+</section>
 
-    <a href="{{ path('app_couvoiturage_index') }}">back to list</a>
+<div class="container my-4">
+  <div class="row g-4">
+
+    {# ====== Colonne gauche : Formulaire ====== #}
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex align-items-center justify-content-between">
+          <strong>Informations du trajet</strong>
+          {% if isPassenger %}
+            <span class="badge rounded-pill bg-warning text-dark">
+              <i class="bi bi-exclamation-triangle me-1"></i> Mode passager : publication indisponible
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="card-body">
+          {# Ton formulaire généré #}
+          {{ include('driver/couvoiturage/_form.html.twig', { button_label: 'Publier le trajet' }) }}
+        </div>
+
+        <div class="card-footer bg-white d-flex justify-content-between">
+          <a href="{{ path('app_couvoiturage_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+          </a>
+          {# Si ton _form inclut déjà un bouton submit, tu peux supprimer ce bouton-ci #}
+          <button form="form" class="btn btn-primary text-white {{ isPassenger ? 'disabled' : '' }}"
+                  {% if isPassenger %}disabled aria-disabled="true"{% endif %}>
+            <i class="bi bi-check2-circle me-1"></i> Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {# ====== Colonne droite : Actions ====== #}
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Actions</strong>
+        </div>
+        <div class="card-body d-grid gap-2">
+          <a href="{{ path('app_couvoiturage_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-list-ul me-1"></i> Mes covoiturages
+          </a>
+
+          <a href="{{ path('app_preference_utilisateur_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-sliders2 me-1"></i> Mes préférences
+          </a>
+
+          <a href="{{ path('app_voiture_new') }}"
+             class="btn btn-outline-secondary {{ isPassenger ? 'disabled' : '' }}"
+             aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
+             {% if isPassenger %}tabindex="-1"{% endif %}>
+            <i class="bi bi-plus-lg me-1"></i> Ajouter une voiture
+          </a>
+
+          <form method="post" action="{{ path('app_switch_mode') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('switch_mode') }}">
+            <button type="submit" class="btn btn-outline-secondary w-100">
+              <i class="bi {{ isDriver ? 'bi-person' : 'bi-car-front' }} me-2"></i>
+              {{ isDriver ? 'Passer en mode Passager' : 'Passer en mode Conducteur' }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {# Petit rappel conditions (optionnel) #}
+      <div class="card border-0 shadow-sm mt-3">
+  <div class="card-body">
+    <h6 class="text-uppercase text-muted small mb-2">
+      <i class="bi bi-clipboard-check me-1"></i> Note au conducteur
+    </h6>
+
+    <ul class="list-unstyled small mb-0">
+      <li class="d-flex mb-2">
+        <i class="bi bi-geo-alt me-2 text-muted"></i>
+        <span>Indiquez un point de départ et d’arrivée </span>
+      </li>
+      <li class="d-flex mb-2">
+        <i class="bi bi-calendar2-week me-2 text-muted"></i>
+        <span>Choisissez une date/heure réalistes et soyez ponctuel.</span>
+      </li>
+      <li class="d-flex mb-2">
+        <i class="bi bi-people me-2 text-muted"></i>
+        <span>Renseignez le <strong>nombre de places disponibles</strong> (hors conducteur).</span>
+      </li>
+      <li class="d-flex mb-2">
+        <i class="bi bi-cash-coin me-2 text-muted"></i>
+        <span>Fixez un <strong>prix par personne</strong> transparent et cohérent.</span>
+      </li>
+      <li class="d-flex mb-2">
+        <i class="bi bi-sliders2 me-2 text-muted"></i>
+        <span>Vérifiez vos <a href="{{ path('app_preference_utilisateur_index') }}">préférences de trajet</a> (tabac, animaux, musique…).</span>
+      </li>
+      
+     
+    </ul>
+  </div>
+</div>
+
+
+  </div>
+</div>
 {% endblock %}

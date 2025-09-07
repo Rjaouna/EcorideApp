@@ -5,6 +5,7 @@ namespace App\Controller\Driver;
 use App\Entity\Couvoiturage;
 use App\Form\CouvoiturageType;
 use App\Repository\CouvoiturageRepository;
+use App\Repository\PreferenceUtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,12 +48,19 @@ final class CouvoiturageController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_couvoiturage_show', methods: ['GET'])]
-    public function show(Couvoiturage $couvoiturage): Response
-    {
+    public function show(
+        Couvoiturage $couvoiturage,
+        PreferenceUtilisateurRepository $prefRepo
+    ): Response {
+        $driver = $couvoiturage->getDriver(); // ou ->getUser() selon ton nom
+        $preference = $driver ? $prefRepo->findBy(['user' => 7]) : null;
+
         return $this->render('driver/couvoiturage/show.html.twig', [
             'couvoiturage' => $couvoiturage,
+            'preferences'   => $preference,   // ✅ singulier
         ]);
     }
+
 
     #[Route('/{id}/edit', name: 'app_couvoiturage_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Couvoiturage $couvoiturage, EntityManagerInterface $entityManager): Response

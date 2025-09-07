@@ -108,27 +108,52 @@
 
            
 
-            {% if couvoiturage.passagers is defined %}
-              <div class="col-12">
-                <div class="text-muted small mb-1">Passagers</div>
+            
+            
+          </div>
+        </div>
+        
+      </div>
+      
+
+{% if couvoiturage.passagers is defined %}
+              <div class="col-12 my-3">
+                <div class="text-muted small mb-1">Passagers participants :</div>
                 {% if couvoiturage.passagers|length == 0 %}
                   <div class="text-muted">Aucun passager inscrit.</div>
                 {% else %}
                   <ul class="list-unstyled mb-0">
                     {% for p in couvoiturage.passagers %}
-                      <li>
-                        <i class="bi bi-person"></i>
-                        {{ p.prenom ~ ' ' ~ p.nom }} <span class="text-muted">(#{{ p.id }})</span>
-                      </li>
+                      {#Informations de passager participant#}
+                      <div class="card shadow-sm border-0 mb-3" style="max-width: 320px;">
+  <div class="row g-0 align-items-center">
+    <div class="col-auto d-flex align-items-center justify-content-center rounded mx-1"
+         style="width: 40px; height: 40px; background: rgba(0,0,0,.05);">
+      <i class="bi bi-person-circle fs-3 text-secondary"></i>
+    </div>
+    <div class="col">
+      <div class="card-body py-2">
+        <h6 class="card-title mb-1">{{ p.prenom }} {{ p.nom }}</h6>
+        <p class="card-text small mb-1">
+          <i class="bi bi-telephone text-muted"></i>
+          <a href="tel:{{ p.telephone }}">{{ p.telephone }}</a>
+        </p>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
                     {% endfor %}
                   </ul>
                 {% endif %}
               </div>
             {% endif %}
-            
-          </div>
-        </div>
-      </div>
+
+
+
+
+
     </div>
 
     {# ===== Colonne droite : actions ===== #}
@@ -146,13 +171,95 @@
             <i class="bi bi-pencil"></i> Modifier
         </a>
         {% else %}
-        <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}" class="btn btn-primary text-white">
-            Participer à ce couvoiturage
-        </a>
+                <form method="post" action="{{ path('app_passager_reservation', {'id': couvoiturage.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('reserver' ~ couvoiturage.id) }}">
+        {% set full = couvoiturage.nbPlace == 0 ? 'disabled' : ''  %}
+        {% set texte = couvoiturage.nbPlace == 0 ? 'Couvoiturage complet' : 'Réserver ce trajet'  %}
+        
+        <button class="btn btn-primary w-100 text-white  {{full}}">
+            <i class="bi bi-check-circle"></i> {{texte}} 
+        </button>
+        </form>
         {% endif %}
 
         </div>
       </div>
+      <div class="card border-0 shadow-sm mb-4  my-2">
+
+
+  <div class="card-body">
+    <h6 class="text-uppercase text-muted small mb-2">
+      <i class="bi bi-info-circle me-1"></i> Rappel des conditions pour ce trajet
+    </h6>
+    <p >
+      Merci de respecter les conditions proposées par le conducteur.
+    </p>
+
+{% set yes = ['1', 1, true, 'true', 'on', 'yes'] %}
+{% set mapYN = { true:'Autorisée', false:'Interdite' } %}
+{% set mapTabac = { 'autoriser':'Autorisé', 'interdire':'Interdit', 'discuter':'À discuter' } %}
+{% set mapAnimaux = { 'autoriser':'Autorisés', 'interdire':'Interdits', 'discuter':'À discuter' } %}
+{% set mapConv = { 'calme':'Calme', 'normal':'Normal', 'bavard':'Bavard' } %}
+{% set mapMusic = { 'basse':'Basse', 'moyenne':'Moyenne', 'haute':'Forte' } %}
+
+{% if preferences is empty %}
+  <div class="alert alert-info">Aucune préférence enregistrée.</div>
+{% else %}
+  <div class="row">
+    {% for p in preferences %}
+      <div class="col-md-12 col-lg-12">
+        <div class="card border-0 shadow-sm h-100">
+          
+
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-slash-circle text-muted me-2"></i> Tabac</span>
+              <span class="badge {{ p.politiqueTabac == 'autoriser' ? 'bg-success' : (p.politiqueTabac == 'interdire' ? 'bg-danger' : 'bg-warning text-dark') }}">
+                {{ mapTabac[p.politiqueTabac|lower]|default(p.politiqueTabac) }}
+              </span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-paw text-muted me-2"></i> Animaux</span>
+              <span class="badge {{ p.politiqueAnimaux == 'autoriser' ? 'bg-success' : (p.politiqueAnimaux == 'interdire' ? 'bg-danger' : 'bg-warning text-dark') }}">
+                {{ mapAnimaux[p.politiqueAnimaux|lower]|default(p.politiqueAnimaux) }}
+              </span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-chat-dots text-muted me-2"></i> Conversation</span>
+              <span class="fw-semibold">{{ mapConv[p.niveauConversation|lower]|default(p.niveauConversation) }}</span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-music-note-beamed text-muted me-2"></i> Musique</span>
+              <span class="fw-semibold">{{ mapMusic[p.niveauMusique|lower]|default(p.niveauMusique) }}</span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-egg-fried text-muted me-2"></i> Nourriture</span>
+              {% set food = p.autoriseNourriture in yes %}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-cup-hot text-muted me-2"></i> Boissons</span>
+              {% set drink = p.autoriseBoissons in yes %}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-bag text-muted me-2"></i> Bagages (max)</span>
+              <span class="fw-semibold">{{ p.tailleMaxBagages }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  </div>
+</div>
+
     </div>
 
   </div>
