@@ -68,9 +68,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Voiture::class, mappedBy: 'user')]
     private Collection $voitures;
 
+    /**
+     * @var Collection<int, Couvoiturage>
+     */
+    #[ORM\OneToMany(targetEntity: Couvoiturage::class, mappedBy: 'driver')]
+    private Collection $couvoiturages;
+
+    /**
+     * @var Collection<int, Couvoiturage>
+     */
+    #[ORM\ManyToMany(targetEntity: Couvoiturage::class, mappedBy: 'passagers')]
+    private Collection $couvoituragesparticipe;
+
     public function __construct()
     {
         $this->voitures = new ArrayCollection();
+        $this->couvoiturages = new ArrayCollection();
+        $this->couvoituragesparticipe = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -287,6 +301,63 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($voiture->getUser() === $this) {
                 $voiture->setUser(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Couvoiturage>
+     */
+    public function getCouvoiturages(): Collection
+    {
+        return $this->couvoiturages;
+    }
+
+    public function addCouvoiturage(Couvoiturage $couvoiturage): static
+    {
+        if (!$this->couvoiturages->contains($couvoiturage)) {
+            $this->couvoiturages->add($couvoiturage);
+            $couvoiturage->setDriver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCouvoiturage(Couvoiturage $couvoiturage): static
+    {
+        if ($this->couvoiturages->removeElement($couvoiturage)) {
+            // set the owning side to null (unless already changed)
+            if ($couvoiturage->getDriver() === $this) {
+                $couvoiturage->setDriver(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Couvoiturage>
+     */
+    public function getCouvoituragesparticipe(): Collection
+    {
+        return $this->couvoituragesparticipe;
+    }
+
+    public function addCouvoituragesparticipe(Couvoiturage $couvoituragesparticipe): static
+    {
+        if (!$this->couvoituragesparticipe->contains($couvoituragesparticipe)) {
+            $this->couvoituragesparticipe->add($couvoituragesparticipe);
+            $couvoituragesparticipe->addPassager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCouvoituragesparticipe(Couvoiturage $couvoituragesparticipe): static
+    {
+        if ($this->couvoituragesparticipe->removeElement($couvoituragesparticipe)) {
+            $couvoituragesparticipe->removePassager($this);
         }
 
         return $this;
