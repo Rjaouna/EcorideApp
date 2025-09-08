@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -79,6 +80,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\ManyToMany(targetEntity: Couvoiturage::class, mappedBy: 'passagers')]
     private Collection $couvoituragesparticipe;
+
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Wallet $wallet = null;
 
     public function __construct()
     {
@@ -361,5 +365,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getWallet(): ?Wallet
+    {
+        return $this->wallet;
+    }
+
+    public function setWallet(?Wallet $wallet): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($wallet === null && $this->wallet !== null) {
+            $this->wallet->setUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($wallet !== null && $wallet->getUser() !== $this) {
+            $wallet->setUser($this);
+        }
+
+        $this->wallet = $wallet;
+
+        return $this;
+    }
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        // Si aucun wallet n’est déjà lié, on en crée un
+        if ($this->wallet === null) {
+            $this->setWallet(new Wallet());   // cascade: persist fera le reste
+        }
     }
 }
