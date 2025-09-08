@@ -18,11 +18,13 @@ final class ReservationController extends AbstractController
     {
         $user = $this->getUser();
 
+
         // CSRF (facultatif mais recommandé)
         if (!$this->isCsrfTokenValid('reserver' . $covoiturage->getId(), $request->request->get('_token'))) {
-            $this->addFlash('error', 'Jeton CSRF invalide.');
+            $this->addFlash('warning', 'Jeton CSRF invalide.');
             return $this->redirectToRoute('app_couvoiturage_show', ['id' => $covoiturage->getId()]);
         }
+
 
         // Le conducteur ne peut pas se réserver lui-même
         if ($user === $covoiturage->getDriver()) {
@@ -33,6 +35,14 @@ final class ReservationController extends AbstractController
         // Déjà inscrit ?
         if ($covoiturage->getPassagers()->contains($user)) {
             $this->addFlash('warning', 'Vous participez déjà à ce covoiturage.');
+            return $this->redirectToRoute('app_couvoiturage_show', ['id' => $covoiturage->getId()]);
+        }
+        // Vérifier le solde de passager avant de réserver le trajet
+        $wallet = $user->getWallet();
+        $soldeDisponible = $wallet->getSoldeDisponible();
+        $soldeEnAttente = $wallet->getSoldeEnAttente();
+        if ($soldeDisponible < 2) {
+            $this->addFlash('warning', 'Votre solde n\'est pas suffisant pour réserver ce trajet.');
             return $this->redirectToRoute('app_couvoiturage_show', ['id' => $covoiturage->getId()]);
         }
 
@@ -47,6 +57,8 @@ final class ReservationController extends AbstractController
         $covoiturage->addPassager($user);
         // Décrémenter les places restantes
         $covoiturage->setNbPlace($covoiturage->getNbPlace() - 1);
+        $wallet->setSoldeDisponible($soldeDisponible - 2);
+        $wallet->setSoldeEnAttente($soldeEnAttente + 2);
 
 
         // (Facultatif) si plus de place après ajout, passer le statut à FULL

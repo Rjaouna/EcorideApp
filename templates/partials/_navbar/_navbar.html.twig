@@ -58,6 +58,8 @@
           </a>
         </li>
         <li class="nav-item ms-md-2">
+        {% if app.user %}
+          
         {# --- NAV WALLET (à coller dans <ul class="navbar-nav ms-auto align-items-lg-center">) --- #}
 <li class="nav-item dropdown ms-md-2">
   <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navWallet"
@@ -94,6 +96,7 @@
 
     
 </li>
+        {% endif %}
 
         </li>
 

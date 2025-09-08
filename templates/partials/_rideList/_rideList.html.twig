@@ -6,40 +6,58 @@
     </h2>
 
     <div class="row g-4">
-        {% set rides = [
-            {'from': 'Paris', 'to': 'Lyon', 'date': '2024-06-01 08:00', 'price': '25€', 'driver': 'Jean Dupont'},
-            {'from': 'Marseille', 'to': 'Nice', 'date': '2024-06-02 10:30', 'price': '20€', 'driver': 'Marie Lemoine'},
-            {'from': 'Bordeaux', 'to': 'Toulouse', 'date': '2024-06-03 14:00', 'price': '18€', 'driver': 'Ahmed Ben'},
-            {'from': 'Lille', 'to': 'Bruxelles', 'date': '2024-06-04 09:00', 'price': '30€', 'driver': 'Sophie Martin'}
-        ] %}
+      
 
-        {% for ride in rides %}
-            <div class="col-md-3">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="fw-bold">{{ ride.from }} → {{ ride.to }}</h5>
-                            <p class="text-muted small">
-                                {{ ride.date }}
-                            </p>
-                            <p class="fw-bold text-primary">
-                                {{ ride.price }}
-                            </p>
-                        </div>
-                        <div class="mt-3">
-                            <p class="small text-muted mb-0">Conducteur :</p>
-                            <p class="fw-bold">{{ ride.driver }}</p>
-                        </div>
-                    </div>
-                </div>
+{% for ride in couvoiturages %}
+  {% set s = ride.statut|default('PLANNED') %}
+  {% set badgeClass =
+    s == 'PUBLISHED' ? 'bg-success' :
+    (s == 'FULL' ? 'bg-warning text-dark' :
+    (s == 'CANCELLED' ? 'bg-danger' :
+    (s == 'PLANNED' ? 'bg-secondary' : 'bg-info'))) %}
+
+  <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <div class="card h-100 shadow-sm border-0 card-hover position-relative">
+      <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="fw-bold mb-0 text-truncate">
+            <i class="bi bi-geo-alt me-1"></i>
+            {{ ride.lieuDepart }} <i class="bi bi-arrow-right mx-1"></i> {{ ride.lieuArrivee }}
+          </h5>
+          <span class="badge {{ badgeClass }} ms-2">{{ s }}</span>
+        </div>
+
+        <p class="text-muted small mb-1">
+          <i class="bi bi-calendar2 me-1"></i>
+          {{ ride.departAt|date('d/m/Y \\à H:i') }}
+        </p>
+
+        <p class="fw-bold text-primary mb-2">
+          <i class="bi bi-cash-coin me-1"></i>
+          {{ ride.prixPersonne|number_format(2, ',', ' ') }} €
+        </p>
+
+        <div class="mt-auto pt-2 small text-muted">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-person me-1"></i>
+            <span class="fw-semibold">{{ ride.driver.prenom ~ ' ' ~ ride.driver.nom }}</span>
+          </div>
+          {% if ride.voiture is defined and ride.voiture %}
+            <div class="d-flex align-items-center mt-1">
+              <i class="bi bi-car-front me-1"></i>
+              <span>{{ ride.voiture.marque.nom }} {{ ride.voiture.modele }}</span>
             </div>
-        {% endfor %}
+          {% endif %}
+        </div>
+
+        {# Lien vers le détail du trajet #}
+        <a href="{{ path('app_couvoiturage_show', {'id': ride.id}) }}" class="stretched-link" aria-label="Voir le trajet"></a>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
     </div>
 
-    {# Bouton centré #}
-    <div class="text-center mt-5">
-        <a href="#" class="btn btn-primary fw-bold text-white">
-            Voir tous les trajets
-        </a>
-    </div>
+   
 </div>
