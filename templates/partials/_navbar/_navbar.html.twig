@@ -254,16 +254,4 @@
   </div>
 </div>
 
-{# Hover "inbox" lisible #}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const el = document.getElementById('navInbox');
-  if (!el) return;
-  const original = el.innerHTML;
-  el.addEventListener('mouseenter', () => {
-    el.innerHTML = '<i class="bi bi-envelope-open me-1"></i> Boîte de réception' + 
-      ({{ unreadCount|default(0) }} > 0 ? ' <span class="badge bg-danger ms-1">{{ unreadCount }}</span>' : '');
-  });
-  el.addEventListener('mouseleave', () => { el.innerHTML = original; });
-});
-</script>
+

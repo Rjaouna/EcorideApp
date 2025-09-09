@@ -1,111 +1,100 @@
-<div class="container bg-primary py-4 mt-3  rounded">
+<div class="container bg-light text-white py-4 mt-3 rounded-4 shadow-sm">
   <form method="get" action="{{ path('app_trouver_un_trajet_page') }}">
-    <div class="row text-center text-white">
-      <h3 class="fw-bold mb-4">
-        Passager ? Trouvez un covoiturage ?
-      </h3>
+    <div class="text-center mb-3">
+      <h3 class="mb-0 text-primary">Passager ? Trouvez un covoiturage</h3>
     </div>
 
-    <div class="row justify-content-center align-items-center g-0">
-
+    <div class="row g-2 g-md-3 align-items-end">
       {# Départ #}
-      <div class="col-md-3 mx-2 d-flex align-items-center">
-        <div class="w-100 mb-0">
-        
+      <div class="col-12 col-md-3">
+        <div class="input-group input-group-lg">
+          <span class="input-group-text rounded-start-pill bg-primary text-white"><i class="bi bi-geo-alt"></i></span>
           <input
             type="text"
             id="departureCity"
             name="depart"
-            class="form-control form-control-lg"
-            placeholder="Départ : Paris, Lille..."
-            required 
-            style="
-              background-image: url('{{ asset('assets/img/deparature.png') }}');
-              background-repeat: no-repeat;
-              background-position: 10px center;
-              background-size: 20px 20px;
-              padding-left: 40px;
-              color: rgb(113 113 113);
-              font-weight: 600;
-            "
+            class="form-control rounded-end-pill"
+            placeholder="Départ : Paris, Lille…"
+            required
+            value="{{ depart|default('') }}"
           >
         </div>
       </div>
 
-      {# Swap : flèche en SVG #}
-      <div class="col-md-auto d-flex justify-content-center align-items-center">
-        <div class="btn-group" role="group" aria-label="Permutation des villes">
-          <button type="button" id="swap" class="btn btn-light p-2" aria-label="Permuter vers la gauche">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-              <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
-            </svg>
-          </button>
-        </div>
+      {# Swap #}
+      <div class="col-12 col-md-auto d-flex justify-content-center">
+        <button type="button" id="swap"
+                class="btn btn-light btn-lg rounded-circle shadow-sm mt-1 mt-md-0"
+                title="Permuter Départ / Arrivée"
+                style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;">
+          <i class="bi bi-arrow-left-right"></i>
+        </button>
       </div>
 
       {# Arrivée #}
-      <div class="col-md-3 mx-2 d-flex align-items-center">
-        <div class="w-100 mb-0">
+      <div class="col-12 col-md-3">
+        <div class="input-group input-group-lg">
+          <span class="input-group-text rounded-start-pill bg-primary text-white"><i class="bi bi-flag"></i></span>
           <input
             type="text"
             id="destinationCity"
             name="arrivee"
-            class="form-control form-control-lg"
-            placeholder="Arrivée : Marseille, Paris"
-            required 
-            style="
-              background-image: url('{{ asset('assets/img/deparature.png') }}');
-              background-repeat: no-repeat;
-              background-position: 10px center;
-              background-size: 20px 20px;
-              padding-left: 40px;
-              color: rgb(113 113 113);
-              font-weight: 600;
-            "
+            class="form-control rounded-end-pill"
+            placeholder="Arrivée : Marseille, Lyon…"
+            required
+            value="{{ arrivee|default('') }}"
           >
         </div>
       </div>
 
       {# Date #}
-      <div class="col-md-2 mx-2 d-flex align-items-center">
-        <div class="w-100 mb-0">
+      <div class="col-6 col-md-3">
+        <div class="input-group input-group-lg">
+          <span class="input-group-text rounded-start-pill bg-primary text-white"><i class="bi bi-calendar-event"></i></span>
           <input
             type="date"
             id="travelDate"
             name="departAt"
-            class="form-control form-control-lg"
-            style="color: rgb(113 113 113); font-weight: 600;"
+            class="form-control rounded-end-pill"
+            value="{{ departAt|default('') }}"
           >
         </div>
       </div>
 
-      {# Bouton rechercher #}
-      <div class="col-md-2 mx-2 d-flex align-items-center">
-        <button type="submit" class="btn btn-secondary w-100 btn-lg" >
-          Rechercher
+      {# Rechercher #}
+      <div class="col-6 col-md-2 d-grid">
+        <label class="form-label mb-1 invisible">Rechercher</label>
+        <button type="submit" class="btn btn-primary btn-lg rounded-pill text-white">
+          <i class="bi bi-search me-1"></i> Rechercher
         </button>
       </div>
     </div>
   </form>
 </div>
 
-{# JS : permutation des deux champs #}
 <script>
 (() => {
   const dep  = document.getElementById('departureCity');
   const dest = document.getElementById('destinationCity');
-  const swapBtn = document.getElementById('swap'); 
+  const swapBtn = document.getElementById('swap');
 
-  if (!dep || !dest || !swapBtn) return;
-
-  function swapCities() {
+  swapBtn?.addEventListener('click', () => {
     const tmp = dep.value;
     dep.value = dest.value;
     dest.value = tmp;
     dep.focus();
-  }
+  });
 
-  swapBtn.addEventListener('click', swapCities);
+  // Optionnel : min = aujourd'hui
+  const d = document.getElementById('travelDate');
+  if (d && !d.value) d.min = new Date().toISOString().split('T')[0];
 })();
 </script>
 
+<style>
+/* Ajuste légèrement la taille en très petit écran */
+@media (max-width: 575.98px){
+  .input-group.input-group-lg .form-control,
+  .input-group.input-group-lg .input-group-text{ font-size: 1rem; }
+}
+</style>
