@@ -202,6 +202,7 @@
              class="btn btn-sm btn-outline-secondary">
             Voir
           </a>
+          <a href="{{path('app_passager_annuler_couvoiturage', {'id': t.id})}}">Annuler</a>
         </div>
       </div>
     </div>
@@ -229,12 +230,12 @@
         </div>
         <div class="card-body d-grid gap-2">
           <a href="#" class="btn btn-outline-secondary"><i class="bi bi-person me-1" aria-hidden="true"></i> Modifier mon profil</a>
-          <a href="{{path('app_preference_utilisateur_index')}}" class="btn btn-outline-secondary"><i class="bi bi-sliders2 me-1" aria-hidden="true"></i> Mes préférences</a>
+          <a href="{{path('app_preference_utilisateur_index')}}" class="btn btn-outline-secondary {{ isPassenger ? 'd-none' : '' }}"><i class="bi bi-sliders2 me-1" aria-hidden="true"></i> Mes préférences</a>
 <a class="btn btn-outline-secondary  {{accesRide}}" href="{{path('app_couvoiturage_index')}}">
          Mes couvoiturage
       </a>
           <a href="{{ path('app_voiture_new') }}"
-             class="btn btn-outline-secondary {{ isPassenger ? 'disabled' : '' }}"
+             class="btn btn-outline-secondary {{ isPassenger ? 'd-none' : '' }}"
              aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
              {% if isPassenger %}tabindex="-1"{% endif %}>
             <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Ajouter une voiture

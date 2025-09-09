@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\WalletRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WalletRepository::class)]
@@ -25,6 +27,17 @@ class Wallet
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @var Collection<int, Couvoiturage>
+     */
+    #[ORM\ManyToMany(targetEntity: Couvoiturage::class, inversedBy: 'wallets')]
+    private Collection $couvoiturage;
+
+    public function __construct()
+    {
+        $this->couvoiturage = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -89,6 +102,30 @@ class Wallet
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * @return Collection<int, Couvoiturage>
+     */
+    public function getCouvoiturage(): Collection
+    {
+        return $this->couvoiturage;
+    }
+
+    public function addCouvoiturage(Couvoiturage $couvoiturage): static
+    {
+        if (!$this->couvoiturage->contains($couvoiturage)) {
+            $this->couvoiturage->add($couvoiturage);
+        }
+
+        return $this;
+    }
+
+    public function removeCouvoiturage(Couvoiturage $couvoiturage): static
+    {
+        $this->couvoiturage->removeElement($couvoiturage);
+
+        return $this;
     }
     
 }

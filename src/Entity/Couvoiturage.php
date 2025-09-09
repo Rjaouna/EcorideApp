@@ -57,9 +57,16 @@ class Couvoiturage
     #[ORM\JoinColumn(nullable: false)]
     private ?Voiture $voiture = null;
 
+    /**
+     * @var Collection<int, Wallet>
+     */
+    #[ORM\ManyToMany(targetEntity: Wallet::class, mappedBy: 'couvoiturage')]
+    private Collection $wallets;
+
     public function __construct()
     {
         $this->passagers = new ArrayCollection();
+        $this->wallets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -230,6 +237,33 @@ class Couvoiturage
     public function setVoiture(?Voiture $voiture): static
     {
         $this->voiture = $voiture;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Wallet>
+     */
+    public function getWallets(): Collection
+    {
+        return $this->wallets;
+    }
+
+    public function addWallet(Wallet $wallet): static
+    {
+        if (!$this->wallets->contains($wallet)) {
+            $this->wallets->add($wallet);
+            $wallet->addCouvoiturage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWallet(Wallet $wallet): static
+    {
+        if ($this->wallets->removeElement($wallet)) {
+            $wallet->removeCouvoiturage($this);
+        }
 
         return $this;
     }

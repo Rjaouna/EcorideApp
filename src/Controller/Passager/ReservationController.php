@@ -58,6 +58,7 @@ final class ReservationController extends AbstractController
         // Décrémenter les places restantes
         $covoiturage->setNbPlace($covoiturage->getNbPlace() - 1);
         $wallet->setSoldeDisponible($soldeDisponible - 2);
+        $wallet->addCouvoiturage($covoiturage);
         $wallet->setSoldeEnAttente($soldeEnAttente + 2);
 
 
