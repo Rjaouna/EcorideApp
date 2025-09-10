@@ -1,13 +1,183 @@
+{# templates/driver/couvoiturage/edit.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Couvoiturage{% endblock %}
+{% block title %}Modifier le covoiturage #{{ couvoiturage.id }}{% endblock %}
 
 {% block body %}
-    <h1>Edit Couvoiturage</h1>
+{% set isPassenger = app.user and 'ROLE_PASSAGER' in app.user.roles %}
+{% set isDriver    = app.user and 'ROLE_DRIVER'   in app.user.roles %}
+{% set mode        = isDriver ? 'Conducteur' : 'Passager' %}
 
-    {{ include('driver/couvoiturage/_form.html.twig', {'button_label': 'Update'}) }}
+{# Bandeau titre #}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 text-primary mb-1">Modifier un covoiturage — mode {{ mode }}</h1>
+        <p class="text-muted mb-0">Mettez à jour les informations du trajet puis enregistrez.</p>
+      </div>
+      <div class="d-none d-md-flex gap-2">
+        <a href="{{ path('app_couvoiturage_index') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+      </div>
+    </div>
+    <hr class="mt-4">
+  </div>
+</section>
 
-    <a href="{{ path('app_couvoiturage_index') }}">back to list</a>
+<div class="container my-4">
+  <div class="row g-4">
 
-    {{ include('driver/couvoiturage/_delete_form.html.twig') }}
+    {# ===== Colonne gauche : Formulaire ===== #}
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex align-items-center justify-content-between">
+          <strong>Informations du trajet</strong>
+          {% if isPassenger %}
+            <span class="badge rounded-pill bg-warning text-dark">
+              <i class="bi bi-exclamation-triangle me-1"></i> Mode passager : modification indisponible
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="card-body">
+          {# Donne un id au form pour le bouton en pied de carte #}
+          {{ form_start(form, { attr: { id: 'trajetForm' } }) }}
+            {{ form_widget(form) }}
+          {{ form_end(form) }}
+        </div>
+
+        <div class="card-footer bg-white d-flex flex-wrap justify-content-between gap-2">
+          <a href="{{ path('app_couvoiturage_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+          </a>
+
+          <div class="ms-auto d-flex gap-2">
+            {# Supprimer #}
+            {{ include('driver/couvoiturage/_delete_form.html.twig', { buttonClass:'btn btn-outline-danger' }) }}
+
+            {# Enregistrer #}
+            <button form="trajetForm"
+                    class="btn btn-primary text-white {{ isPassenger ? 'disabled' : '' }}"
+                    {% if isPassenger %}disabled aria-disabled="true"{% endif %}>
+              <i class="bi bi-check2-circle me-1"></i> Mettre à jour
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ===== Colonne droite : Actions ===== #}
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Actions</strong>
+        </div>
+        <div class="card-body d-grid gap-2">
+          <a href="{{ path('app_couvoiturage_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-list-ul me-1"></i> Mes covoiturages
+          </a>
+
+          <a href="{{ path('app_preference_utilisateur_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-sliders2 me-1"></i> Mes préférences
+          </a>
+
+          <a href="{{ path('app_voiture_new') }}"
+             class="btn btn-outline-secondary {{ isPassenger ? 'disabled' : '' }}"
+             aria-disabled="{{ isPassenger ? 'true' : 'false' }}"
+             {% if isPassenger %}tabindex="-1"{% endif %}>
+            <i class="bi bi-plus-lg me-1"></i> Ajouter une voiture
+          </a>
+
+          <form method="post" action="{{ path('app_switch_mode') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('switch_mode') }}">
+            <button type="submit" class="btn btn-outline-secondary w-100">
+              <i class="bi {{ isDriver ? 'bi-person' : 'bi-car-front' }} me-2"></i>
+              {{ isDriver ? 'Passer en mode Passager' : 'Passer en mode Conducteur' }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {# Note au conducteur #}
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-body">
+          <h6 class="text-uppercase text-muted small mb-2">
+            <i class="bi bi-clipboard-check me-1"></i> Note au conducteur
+          </h6>
+          <ul class="list-unstyled small mb-0">
+            <li class="d-flex mb-2">
+              <i class="bi bi-geo-alt me-2 text-muted"></i>
+              <span>Vérifiez les points de départ et d’arrivée.</span>
+            </li>
+            <li class="d-flex mb-2">
+              <i class="bi bi-calendar2-week me-2 text-muted"></i>
+              <span>Assurez-vous que la date/heure est correcte.</span>
+            </li>
+            <li class="d-flex mb-2">
+              <i class="bi bi-people me-2 text-muted"></i>
+              <span>Mettez à jour le <strong>nombre de places</strong> si besoin.</span>
+            </li>
+            <li class="d-flex mb-2">
+              <i class="bi bi-cash-coin me-2 text-muted"></i>
+              <span>Adaptez le <strong>prix</strong> si le trajet change.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{# Validation dates (réutilise les IDs du form) #}
+<script>
+const dateDepart  = document.getElementById('dateDepart');
+const dateArrivee = document.getElementById('dateArrivee');
+
+function asDate(el){ return el?.valueAsDate || (el?.value ? new Date(el.value) : null); }
+const pad = n => String(n).padStart(2,'0');
+const toLocal = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+function validateDates() {
+  const now     = new Date();
+  const depart  = asDate(dateDepart);
+  const arrivee = asDate(dateArrivee);
+
+  if (!dateDepart || !dateArrivee) return;
+
+  dateDepart.setCustomValidity('');
+  dateArrivee.setCustomValidity('');
+
+  if (depart && depart < now) {
+    dateDepart.setCustomValidity('La date de départ doit être dans le futur.');
+  }
+  if (depart && arrivee) {
+    if (arrivee <= depart) {
+      dateArrivee.setCustomValidity("L'arrivée doit être après le départ.");
+    } else if (arrivee - depart < 30 * 60 * 1000) {
+      dateArrivee.setCustomValidity('Durée minimale : 30 minutes.');
+    }
+  }
+  dateDepart.reportValidity();
+  dateArrivee.reportValidity();
+}
+
+dateDepart?.addEventListener('input', validateDates);
+dateArrivee?.addEventListener('input', validateDates);
+
+// min dynamiques
+const now = new Date();
+if (dateDepart)  dateDepart.min  = toLocal(now);
+if (dateArrivee) dateArrivee.min = toLocal(now);
+
+dateDepart?.addEventListener('input', () => {
+  const d = asDate(dateDepart);
+  if (d && dateArrivee) {
+    const m = new Date(d); m.setMinutes(m.getMinutes() + 30);
+    dateArrivee.min = toLocal(m);
+  }
+});
+</script>
 {% endblock %}

@@ -12,10 +12,15 @@ final class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(CouvoiturageRepository $couvoiturage_repository): Response
     {
+        $couvoiturages = $couvoiturage_repository->findBy(
+            [],
+            ['createdAt' => 'DESC'],
+            4
+        );
 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
-            'couvoiturages' => $couvoiturage_repository->findAll(),
+            'couvoiturages' => $couvoiturages
         ]);
     }
 }

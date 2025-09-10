@@ -93,7 +93,6 @@
     <h6 class="text-uppercase text-muted small mb-2">
       <i class="bi bi-clipboard-check me-1"></i> Note au conducteur
     </h6>
-
     <ul class="list-unstyled small mb-0">
       <li class="d-flex mb-2">
         <i class="bi bi-geo-alt me-2 text-muted"></i>
@@ -115,8 +114,6 @@
         <i class="bi bi-sliders2 me-2 text-muted"></i>
         <span>Vérifiez vos <a href="{{ path('app_preference_utilisateur_index') }}">préférences de trajet</a> (tabac, animaux, musique…).</span>
       </li>
-      
-     
     </ul>
   </div>
 </div>
@@ -124,4 +121,51 @@
 
   </div>
 </div>
+
+<script>
+const dateDepart  = document.getElementById('dateDepart');
+const dateArrivee = document.getElementById('dateArrivee');
+
+function asDate(input){
+  return input.valueAsDate || (input.value ? new Date(input.value) : null);
+}
+
+function validateDates() {
+  const now     = new Date();
+  const depart  = asDate(dateDepart);
+  const arrivee = asDate(dateArrivee);
+
+  // Réinitialise les messages natifs
+  dateDepart.setCustomValidity('');
+  dateArrivee.setCustomValidity('');
+
+  // Départ doit être futur
+  if (depart && depart < now) {
+    dateDepart.setCustomValidity('La date de départ doit être dans le futur.');
+  }
+
+  // Arrivée > Départ et ≥ 30 min
+  if (depart && arrivee) {
+    if (arrivee <= depart) {
+      dateArrivee.setCustomValidity("L'arrivée doit être après le départ.");
+    } else if (arrivee - depart < 30 * 60 * 1000) {
+      dateArrivee.setCustomValidity('Durée minimale : 30 minutes.');
+    }
+  }
+
+  // Affiche tout de suite les messages 
+  dateDepart.reportValidity();
+  dateArrivee.reportValidity();
+}
+
+// Passer la référence, ne pas exécuter
+dateDepart.addEventListener('change', validateDates);
+dateArrivee.addEventListener('change', validateDates);
+
+// Optionnel : empêcher de sélectionner une date passée pour "départ"
+const pad = n => String(n).padStart(2,'0');
+const toLocal = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+dateDepart.min = toLocal(new Date());
+</script>
+
 {% endblock %}

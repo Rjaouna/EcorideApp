@@ -1,13 +1,11 @@
-<div class="my-5 container">
-<hr class="hr-blurry">
+<div class="container bg-light py-4 rounded">
 
-    <h2 class="text-center fw-bold mb-5">
+    <h3 class="text-center  my-5">
         Trouvez facilement votre prochain covoiturage. Voyagez malin, économique...
-    </h2>
+    </h3>
 
     <div class="row g-4">
       
-
 {% for ride in couvoiturages %}
   {% set s = ride.statut|default('PLANNED') %}
   {% set badgeClass =

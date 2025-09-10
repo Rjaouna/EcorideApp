@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Form\FormError;
 
 #[Route('/couvoiturage')]
 final class CouvoiturageController extends AbstractController
@@ -33,6 +34,14 @@ final class CouvoiturageController extends AbstractController
         $driver = $this->getUser();
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // $infoCouvoiturage = $form->getData();
+            // $departAt  = $infoCouvoiturage->getDepartAt();
+            // $arriveeAt = $infoCouvoiturage->getArriveeAt();
+            // ça ne fonctionne pas a revoir !
+            // $diffSeconds = $arriveeAt->getTimestamp() - $departAt->getTimestamp();
+            // if ($diffSeconds < 30 * 60) {
+            //     $form->addError(new FormError("Le trajet doit durer au moins 30 minutes."));
+            // }
             $couvoiturage->setDriver($driver);
             $couvoiturage->setStatut('PLANIFIER');
             $entityManager->persist($couvoiturage);

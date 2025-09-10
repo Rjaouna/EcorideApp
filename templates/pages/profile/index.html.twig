@@ -162,60 +162,70 @@
     {% endif %}
   </div>
 </div>
-{# Carte réservée pour l'utilisateur en mode DRIVER #}
-      <div class="card border-0  {{isPassagerBloc}}">
-<div class="row g-3">
-  {% for t in participations %}
-    {% set conducteur = t.driver ?? t.user %}
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-      <div class="card h-100 shadow-sm border-0">
-        <div class="card-body d-flex flex-column justify-content-between">
-          <div>
-            <h5 class="fw-bold mb-1">
-              {{ t.lieuDepart }} → {{ t.lieuArrivee }}
-            </h5>
-            <p class="text-muted small mb-2">
-              {{ t.departAt ? t.departAt|date('d/m/Y H:i') : '—' }}
-            </p>
-            <p class="fw-bold text-primary mb-0">
-              {{ t.prixPersonne }} €
-            </p>
-          </div>
-
-          <div class="mt-3">
-            <p class="small text-muted mb-0">Conducteur :</p>
-            <p class="fw-bold mb-0">
-              {{ conducteur ? (conducteur.prenom ~ ' ' ~ conducteur.nom) : '—' }}
-            </p>
-          </div>
-        </div>
-        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-          {% set s = t.statut %}
-          {% set badgeClass =
-            s == 'PUBLISHED' ? 'bg-success' :
-            (s == 'FULL' ? 'bg-warning text-dark' :
-            (s == 'CANCELLED' ? 'bg-danger' :
-            (s == 'PLANNED' ? 'bg-secondary' : 'bg-info'))) %}
-          <span class="badge {{ badgeClass }}">{{ s }}</span>
-
-          <a href="{{ path('app_couvoiturage_show', {'id': t.id}) }}"
-             class="btn btn-sm btn-outline-secondary">
-            Voir
-          </a>
-          <a href="{{path('app_passager_annuler_couvoiturage', {'id': t.id})}}">Annuler</a>
-        </div>
+{# Carte réservée pour l'utilisateur en mode Passager #}
+     <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 d-flex align-items-center gap-2" id="exampleModalLabel">
+          <i class="bi bi-calendar2-event"></i> Mes trajets réservés
+          {% if participations is defined %}<span class="badge bg-secondary">{{ participations|length }}</span>{% endif %}
+        </h1>
       </div>
+
+      <div class="modal-body">
+        {% if participations is defined and participations is not empty %}
+          <div class="list-group list-group-flush">
+            {% for p in participations %}
+              {% set conducteur = p.driver ?? p.user %}
+              {% set placesRestantes = (p.nbPlace|default(0)) - (p.passagers|length|default(0)) %}
+              {% set s = p.statut %}
+              {% set badgeClass =
+                s == 'PUBLISHED' ? 'bg-success' :
+                (s == 'FULL' ? 'bg-warning text-dark' :
+                (s == 'CANCELLED' ? 'bg-danger' :
+                (s == 'PLANNED' ? 'bg-secondary' : 'bg-info'))) %}
+
+              <a class="list-group-item list-group-item-action py-3" href="{{ path('app_couvoiturage_show', {'id': p.id}) }}">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1 fw-semibold text-truncate">
+                    <i class="bi bi-geo-alt me-1"></i>
+                    {{ p.lieuDepart }} <i class="bi bi-arrow-right mx-1"></i> {{ p.lieuArrivee }}
+                  </h6>
+                  <span class="badge {{ badgeClass }}">{{ s }}</span>
+                </div>
+
+                <div class="small text-muted d-flex flex-wrap gap-3 mt-1">
+                  <span><i class="bi bi-calendar2 me-1"></i>{{ p.departAt ? p.departAt|date('d/m/Y H:i') : '—' }}</span>
+                  <span><i class="bi bi-cash-coin me-1"></i>{{ p.prixPersonne }} €</span>
+                  {% if conducteur %}<span><i class="bi bi-person me-1"></i>{{ conducteur.prenom }} {{ conducteur.nom }}</span>{% endif %}
+                  {% if p.voiture is defined and p.voiture %}
+                    <span><i class="bi bi-car-front me-1"></i>{{ p.voiture.marque.nom }} {{ p.voiture.modele }}</span>
+                  {% endif %}
+                  {% if p.nbPlace is defined %}
+                    <span><i class="bi bi-people me-1"></i>
+                      {% if placesRestantes > 0 %}
+                        {{ placesRestantes }} place{{ placesRestantes>1 ? 's' : '' }} restante{{ placesRestantes>1 ? 's' : '' }}
+                      {% else %}
+                        Complet
+                      {% endif %}
+                    </span>
+                  {% endif %}
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-1"></i> Vous n’avez réservé aucun trajet pour l’instant.
+          </div>
+        {% endif %}
+      </div>
+
+     
     </div>
-  {% else %}
-    <div class="col-12">
-      <div class="alert alert-info mb-0">Aucun trajet réservé.</div>
-    </div>
-  {% endfor %}
+  </div>
+
 </div>
-
-    </div>
-    </div>
-
 
 
 
