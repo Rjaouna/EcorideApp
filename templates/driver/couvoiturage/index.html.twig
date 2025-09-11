@@ -33,8 +33,6 @@
               <th>Statut</th>
               <th>Places</th>
               <th>Prix (€)</th>
-              <th>Créé le</th>
-              <th>Modifié le</th>
               <th class="text-center">Actions</th>
             </tr>
           </thead>
@@ -59,8 +57,6 @@
               </td>
               <td>{{ couvoiturage.nbPlace }}</td>
               <td>{{ couvoiturage.prixPersonne }}</td>
-              <td>{{ couvoiturage.createdAt ? couvoiturage.createdAt|date('d/m/Y H:i') : '-' }}</td>
-              <td>{{ couvoiturage.updatedAt ? couvoiturage.updatedAt|date('d/m/Y H:i') : '-' }}</td>
               <td class="text-center">
                 <a href="{{ path('app_couvoiturage_show', {'id': couvoiturage.id}) }}" class="btn btn-sm btn-outline-secondary">
                   <i class="bi bi-eye"></i> Voir
@@ -71,6 +67,32 @@
                 <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}" class="btn btn-sm btn-outline-warning">
                   <i class="bi bi-pencil"></i> Annuler
                 </a>
+            {# Prépare des timestamps #}
+{% set nowTs   = 'now'|date('U') %}
+{% set startTs = couvoiturage.departAt|date('U') %}
+{% set endTs   = couvoiturage.arriveeAt|date('U') %}
+
+{# Avant le départ : proposer "Démarrer" (si tu veux autoriser le départ) #}
+{% if nowTs < startTs %}
+  <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}"
+     class="btn btn-sm btn-primary">
+    Démarrer
+  </a>
+{% endif %}
+
+{# Trajet en cours : proposer "Arrêter" #}
+{% if nowTs >= startTs and nowTs < endTs %}
+  <a href="{{ path('app_couvoiturage_edit', {'id': couvoiturage.id}) }}"
+     class="btn btn-sm btn-danger">
+    Arrêter
+  </a>
+{% endif %}
+
+{# Trajet terminé : rien à faire / badge éventuel #}
+{% if nowTs >= endTs %}
+  <span class="badge bg-secondary">Trajet terminé</span>
+{% endif %}
+
               </td>
             </tr>
           {% else %}
